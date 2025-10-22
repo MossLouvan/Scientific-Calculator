@@ -1,0 +1,31 @@
+# go to project directory if not already there
+Set-Location 'C:\Users\Mossl\OneDrive - Iowa State University\Desktop\Secure Database'
+
+# create .gitignore (if you didn't create it manually)
+@'
+# Build artifacts
+*.o
+*.exe
+/build/
+output/
+
+# Python
+__pycache__/
+*.pyc
+
+# Editor / OS
+.vscode/
+.DS_Store
+Thumbs.db
+
+# MSYS2 / MinGW binaries (if you accidentally add them)
+C:/msys64/**
+
+# Secrets / local env
+secret.key
+secret.*env
+*.pem
+.env
+
+'@ | Out-File -FilePath .gitignore -Encoding utf8
+

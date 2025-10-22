@@ -1,0 +1,16 @@
+GtkWindow {
+    font: Comic Sans 12
+}
+
+.button {
+  color: green;
+}
+label#label0 {
+  color: red;
+}
+label#label1 {
+  color: green;
+}
+label#label2 {
+  color: blue;
+}

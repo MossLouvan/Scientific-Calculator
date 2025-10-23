@@ -2,8 +2,10 @@
 #include <math.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-//function prototype because no want error
+/* function prototype (forward declaration) */
 static void on_button_clicked(GtkButton *button, gpointer user_data);
 
 //Whole function setups the calculator window and its components
@@ -15,7 +17,7 @@ static void activate(GtkApplication *app, gpointer user_data) {
     GtkWidget *entry;
 
     window = gtk_application_window_new(app);
-    gtk_window_set_title(GTK_WINDOW(window), "Calculator");
+    gtk_window_set_title(GTK_WINDOW(window), "Scientific Calculator");
     gtk_window_set_default_size(GTK_WINDOW(window), 300, 400);
     gtk_window_set_resizable(GTK_WINDOW(window), FALSE);
 
@@ -48,7 +50,7 @@ static void activate(GtkApplication *app, gpointer user_data) {
         {"EE","Ln","Log","xLog()","",""},
         {"7", "8", "9", "/","",""},
         {"4", "5", "6", "*","",""},
-        {"1", "2", "3", "-","",""},
+        {"1", "2", "3", "-","penar⁻¹",""},
         {"0", ".", "=", "+","penar",""}
 
     };
@@ -267,7 +269,8 @@ static void on_button_clicked(GtkButton *button, gpointer user_data) {
         char buf[512]; snprintf(buf, sizeof(buf), "%sE", txt ? txt : ""); g_object_set(entry, "text", buf, NULL); if (txt) g_free(txt); return;
     }
     if (strcmp(l, "penar") == 0) { gchar *txt = NULL; g_object_get(entry, "text", &txt, NULL); char buf[512]; snprintf(buf,sizeof(buf), "%s(", txt ? txt : ""); g_object_set(entry, "text", buf, NULL); if (txt) g_free(txt); return; }
-
+    if (strcmp(l, "penar⁻¹") == 0) { gchar *txt = NULL; g_object_get(entry, "text", &txt, NULL); char buf[512]; snprintf(buf,sizeof(buf), "%s)", txt ? txt : ""); g_object_set(entry, "text", buf, NULL); if (txt) g_free(txt); return; }
+    
     if (strcmp(l, "clear") == 0) {
         /* Clear the entry text */
         g_object_set(entry, "text", "", NULL);

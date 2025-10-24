@@ -46,7 +46,7 @@ static void activate(GtkApplication *app, gpointer user_data) {
     
     const char *buttons[6][6] = {
 
-        {"Sin","Cos","Tan","clear",""},
+        {"Sin","Cos","Tan","Clear",""},
         {"EE","Ln","Log","xLog()","",""},
         {"7", "8", "9", "/","",""},
         {"4", "5", "6", "*","",""},
@@ -70,7 +70,7 @@ static void activate(GtkApplication *app, gpointer user_data) {
         }
     }
 
-        /* Use gtk_window_present (recommended in GTK4) to show the window */
+        /* Use gtk_window_present to show the window */
         gtk_window_present(GTK_WINDOW(window));
 }
 

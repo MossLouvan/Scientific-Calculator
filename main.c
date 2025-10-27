@@ -5,12 +5,45 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-/* function prototype (forward declaration) */
-static void on_button_clicked(GtkButton *button, gpointer user_data);
+/* Type definitions for expression evaluation */
+typedef enum {TOK_NONE, TOK_NUMBER, TOK_OP, TOK_LPAREN, TOK_RPAREN, TOK_FUNC, TOK_COMMA} TokenType;
 
-//Whole function setups the calculator window and its components
+typedef struct {
+    TokenType type;
+    double value; /* for numbers */
+    char op;      /* for operators */
+    char name[8]; /* for functions (like sin, cos, xlog) */
+} Token;
+
+/* Function prototypes */
+static void on_button_clicked(GtkButton *button, gpointer user_data);
+static void on_entry_activate(GtkEntry *entry);
+static int evaluate_expression(const char *expr, double *result);
+static int tokenize(const char *s, Token *out, int max);
+static int shunting_yard(Token *in, int in_len, Token *out, int max);
+static int eval_rpn(Token *rpn, int len, double *result);
+
+static void on_entry_activate(GtkEntry *entry) {
+    /* Get current text */
+    gchar *txt = NULL;
+    g_object_get(entry, "text", &txt, NULL);
+    
+    /* Evaluate and update display */
+    double res;
+    if (txt && evaluate_expression(txt, &res) == 0) {
+        char buf[128];
+        snprintf(buf, sizeof(buf), "%g", res);
+        g_object_set(entry, "text", buf, NULL);
+    } else {
+        g_object_set(entry, "text", "Error", NULL);
+    }
+    
+    if (txt) g_free(txt);
+}
+
+/* Whole function setups the calculator window and its components */
 static void activate(GtkApplication *app, gpointer user_data) {
-    (void)user_data; /* silence unused parameter warning */
+
 
     GtkWidget *window;
     GtkWidget *grid;
@@ -27,11 +60,15 @@ static void activate(GtkApplication *app, gpointer user_data) {
 
   
     entry = gtk_entry_new();
-    gtk_editable_set_editable(GTK_EDITABLE(entry), FALSE);
+    gtk_editable_set_editable(GTK_EDITABLE(entry), TRUE);  /* Make entry editable */
     gtk_widget_set_margin_top(entry, 10);
     gtk_widget_set_margin_bottom(entry, 10);
     gtk_widget_set_margin_start(entry, 10);
     gtk_widget_set_margin_end(entry, 10);
+    
+    /* Handle key events for the entry */
+    g_signal_connect(entry, "activate", G_CALLBACK(on_entry_activate), NULL);  /* Enter key */
+    
     gtk_box_append(GTK_BOX(vbox), entry);
 
 
@@ -75,19 +112,7 @@ static void activate(GtkApplication *app, gpointer user_data) {
 }
 
 
-typedef enum {TOK_NONE, TOK_NUMBER, TOK_OP, TOK_LPAREN, TOK_RPAREN, TOK_FUNC, TOK_COMMA} TokenType;
-
-typedef struct {
-    TokenType type;
-    double value; /* for numbers */
-    char op;      /* for operators */
-    char name[8]; /* for functions (like sin, cos, xlog) */
-} Token;
-
-/* Forward declarations */
-static int tokenize(const char *s, Token *out, int max);
-static int shunting_yard(Token *in, int in_len, Token *out, int max);
-static int eval_rpn(Token *rpn, int len, double *result);
+/* Expression evaluator implementation */
 
 static int evaluate_expression(const char *expr, double *result) {
     Token toks[512];
@@ -271,7 +296,7 @@ static void on_button_clicked(GtkButton *button, gpointer user_data) {
     if (strcmp(l, "penar") == 0) { gchar *txt = NULL; g_object_get(entry, "text", &txt, NULL); char buf[512]; snprintf(buf,sizeof(buf), "%s(", txt ? txt : ""); g_object_set(entry, "text", buf, NULL); if (txt) g_free(txt); return; }
     if (strcmp(l, "penar⁻¹") == 0) { gchar *txt = NULL; g_object_get(entry, "text", &txt, NULL); char buf[512]; snprintf(buf,sizeof(buf), "%s)", txt ? txt : ""); g_object_set(entry, "text", buf, NULL); if (txt) g_free(txt); return; }
     
-    if (strcmp(l, "clear") == 0) {
+    if (strcasecmp(l, "clear") == 0) {
         /* Clear the entry text */
         g_object_set(entry, "text", "", NULL);
         return;

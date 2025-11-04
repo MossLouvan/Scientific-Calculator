@@ -23,10 +23,10 @@ static void on_button_clicked(GtkButton *button, gpointer user_data);
 static void on_entry_activate(GtkEntry *entry);
 static int evaluate_expression(const char *expr, double *result);
 static int tokenize(const char *s, Token *out, int max);
-static int shunting_yard(Token *in, int in_len, Token *out, int max);
+static int shunting_yard(Token *in, int in_len, Token *out);
 static int eval_rpn(Token *rpn, int len, double *result);
 static int operator_precedence(char op);
-static void activate(GtkApplication *app, gpointer user_data);
+static void activate(GtkApplication *app);
 
 /* ------------------------Runs when user presses enter --------------------------- */
 static void on_entry_activate(GtkEntry *entry) {
@@ -50,7 +50,7 @@ static void on_entry_activate(GtkEntry *entry) {
 }
 
 /* ---------------------Calculator Window and Buttons --------------------------- */
-static void activate(GtkApplication *app, gpointer user_data) {
+static void activate(GtkApplication *app) {
     //Create main window
     GtkWidget *window = gtk_application_window_new(app);
     gtk_window_set_title(GTK_WINDOW(window), "Scientific Calculator");
@@ -110,7 +110,7 @@ static int evaluate_expression(const char *expr, double *result) {
     int n = tokenize(expr, toks, 512);
     if (n < 0) return -1;
 
-    int m = shunting_yard(toks, n, rpn, 512);
+    int m = shunting_yard(toks, n, rpn);
     if (m < 0) return -1;
 
     if (eval_rpn(rpn, m, result) != 0) return -1;
@@ -173,7 +173,7 @@ static int operator_precedence(char op) {
 }
 
 /* --------------------------- Shunting Yard Algorithm --------------------------- */
-static int shunting_yard(Token *in, int in_len, Token *out, int max) {
+static int shunting_yard(Token *in, int in_len, Token *out) {
     Token stack[512];
     int sp = 0, out_n = 0;
 
